@@ -10,12 +10,33 @@ describe Admin::CategoriesController do
     henri = Factory(:user, :login => 'henri', :profile => Factory(:profile_admin, :label => Profile::ADMIN))
     request.session = { :user => henri.id }
   end
-
+  
   it "test_index" do
     get :index
     assert_response :redirect, :action => 'index'
   end
-
+  
+  describe "test_create" do
+     before(:each) do
+       get :new
+     end
+     
+     it 'should render template new' do
+         assert_template 'new'
+         assert_tag :tag => "table",
+        :attributes => { :id => "category_container" }
+     end
+     
+     it 'should create a new category' do
+         post :edit =>{:name => "fake_name", :key => "fake_key", :description => "fake_description"}
+         assert_response :redirect, :action => index
+         assigns(:category).should_not be_nil
+         expect(flash[:notice]).to eq("Category was successfully saved.")
+     end
+  
+end
+     
+     
   describe "test_edit" do
     before(:each) do
       get :edit, :id => Factory(:category).id
